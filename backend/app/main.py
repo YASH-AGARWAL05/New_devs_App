@@ -144,11 +144,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware
+# GZIP compression middleware for response optimization
+app.add_middleware(
+    GZipMiddleware,
+    minimum_size=1000,
+    compresslevel=6
+)
+
+# Performance monitoring middleware
+app.add_middleware(PerformanceMonitoringMiddleware)
+
+# Keep CORS outermost so browser clients receive readable API errors too.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        # Development
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
@@ -160,16 +169,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# GZIP compression middleware for response optimization
-app.add_middleware(
-    GZipMiddleware,
-    minimum_size=1000,
-    compresslevel=6
-)
-
-# Performance monitoring middleware
-app.add_middleware(PerformanceMonitoringMiddleware)
 
 # Include API routers - Auth & User Management Only
 # Authentication
